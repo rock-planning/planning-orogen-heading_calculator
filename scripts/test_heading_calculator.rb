@@ -34,7 +34,7 @@ Orocos.run 'heading_calculator::Task' => 'calculator' do
     traj_sample << trajectory
     traj_writer.write(traj_sample)
     
-    puts "\nTEST 1"
+    puts "\nTEST 1, straight line"
     traj_writer = calc.trajectory.writer
     traj_sample = traj_writer.new_sample
     
@@ -45,7 +45,9 @@ Orocos.run 'heading_calculator::Task' => 'calculator' do
     Readline::readline("Press ENTER to proceed ...")
   
     # Test 2: Curve around the robot, same distance to (3,0), (4.1) and (3,2).
-    puts "\nTEST 2"
+    puts "\nTEST 2, Spline length 2 instead of 10, heading 81 instead of 90"
+    calc.goal_distance = 4.0
+    
     points = []
     points << Eigen::Vector3.new( 0, 0, 0 )
     points << Eigen::Vector3.new( 1, 0, 0 )
@@ -66,6 +68,16 @@ Orocos.run 'heading_calculator::Task' => 'calculator' do
     
     pose_sample.position[0] = 3
     pose_sample.position[1] = 1
+    pose_writer.write(pose_sample)
+    
+    Readline::readline("Press ENTER to proceed ...")
+    
+    puts "\nTEST 3, rotates the robot -90 degree around Z"
+    calc.goal_distance = 4.0
+    
+    pose_sample.position[0] = 3
+    pose_sample.position[1] = 1
+    pose_sample.orientation = Eigen::Quaternion.from_angle_axis(-0.5 * Math::PI, Eigen::Vector3.UnitZ)
     pose_writer.write(pose_sample)
     
     Readline::readline("Press ENTER to exit ...")
