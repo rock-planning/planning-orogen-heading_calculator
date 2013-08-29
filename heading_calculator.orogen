@@ -3,16 +3,21 @@ name "heading_calculator"
 import_types_from "base"
 
 task_context "Task" do
-    property('goal_distance', 'double').
+    property('goal_distance', 'double', 4.0).
         doc 'Distance to the goal position along the trajectory, in meters'
+        
+    property('geometric_resolution', 'double', 0.02).
+        doc 'Length of a single spline element'
 
     input_port("trajectory", "std::vector</base/Trajectory>").
-        doc("(Global) trajectory which should be used to calculate the heading")
+        doc("(Global) trajectory which will be used to calculate the heading")
         
     input_port("pose_samples", "base/samples/RigidBodyState").
         doc "Robot pose within the trajectory frame."
         
     output_port('heading', 'double').
 	    doc 'Heading in NorthWestUp'
+	    
+	port_driven 
 end
 
