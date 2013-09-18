@@ -95,6 +95,10 @@ void Task::updateHook()
         if(goal_pos_r[1] < 0) {
             angle_rad *= -1;
         }
+        
+        // Add offset.
+        angle_rad += _heading_offset.get();
+        
         RTT::log(RTT::Info) << "Calculated heading: " << angle_rad << ", " <<
                 (angle_rad / M_PI) * 180 << " degree " << RTT::endlog();
         _heading.write(angle_rad);

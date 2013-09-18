@@ -80,6 +80,15 @@ Orocos.run 'heading_calculator::Task' => 'calculator' do
     pose_sample.orientation = Eigen::Quaternion.from_angle_axis(-0.5 * Math::PI, Eigen::Vector3.UnitZ)
     pose_writer.write(pose_sample)
     
+    puts "\nTEST 4, same like 3, but with an offset of 3.141592654"
+    calc.heading_offset += 3.141592654
+    
+    
+    pose_sample.position[0] = 3
+    pose_sample.position[1] = 1
+    pose_sample.orientation = Eigen::Quaternion.from_angle_axis(-0.5 * Math::PI, Eigen::Vector3.UnitZ)
+    pose_writer.write(pose_sample)
+    
     Readline::readline("Press ENTER to exit ...")
 end
 
