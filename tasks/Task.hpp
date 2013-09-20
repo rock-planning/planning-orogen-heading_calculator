@@ -17,8 +17,8 @@ namespace heading_calculator {
 
         base::Trajectory mTrajectory;
         base::samples::RigidBodyState mPose;
-        double mGuess; /// Guessed robot position on the spline, [0,1]
-        double mPosSpline; /// Robot position on the spline, [0,1]
+        double mGuess; /// Guessed robot position on the spline
+        double mPosSpline; /// Robot position on the spline
         bool mTrajectoryReceived;
 
     public:

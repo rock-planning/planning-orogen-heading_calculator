@@ -74,7 +74,7 @@ void Task::updateHook()
         mGuess = mPosSpline;
         
         // Advances on the spline, starting at the robot position. 
-        // Return: <goal pos on the spline, distance of the path>, [0,1]
+        // Return: <goal pos on the spline, distance of the path>
         std::pair<double, double> ret_advance = mTrajectory.spline.advance(mPosSpline, 
                 _goal_distance.get(),
                 _geometric_resolution.get());
