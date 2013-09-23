@@ -5,14 +5,14 @@
 using namespace heading_calculator;
 
 Task::Task(std::string const& name, TaskCore::TaskState initial_state)
-    : TaskBase(name, initial_state), mTrajectory(), mPose(), mGuess(0), mPosSpline(0), 
-        mTrajectoryReceived(false)
+    : TaskBase(name, initial_state), mTrajectory(), mPose(), mRefFrame(), mGuess(0), mPosSpline(0), 
+        mTrajectoryReceived(false), mRefFrameReceived(false)
 {
 }
 
 Task::Task(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state)
-    : TaskBase(name, engine, initial_state), mTrajectory(), mPose(), mGuess(0), 
-        mPosSpline(0), mTrajectoryReceived(false)
+    : TaskBase(name, engine, initial_state), mTrajectory(), mPose(), mRefFrame(), mGuess(0), 
+        mPosSpline(0), mTrajectoryReceived(false), mRefFrameReceived(false)
 {
 }
 
@@ -57,7 +57,14 @@ void Task::updateHook()
         mTrajectoryReceived = true;
     }
     
+    
     if(_pose_samples.read(mPose) == RTT::NewData) {
+        // Stores the first received robot pose as reference frame.
+        if(!mRefFrameReceived) {
+            mRefFrame = mPose;
+            mRefFrameReceived = true;
+        }
+    
         if(!mTrajectoryReceived) {
             RTT::log(RTT::Warning) << "Trajectory not yet received" << RTT::endlog();
             return;
@@ -83,16 +90,23 @@ void Task::updateHook()
                 _geometric_resolution.get() << ", goal position on the spline: " << 
                 ret_advance.first << ", point " << goal_pos.transpose() << RTT::endlog();
         
-        // Transform the goal point to the robot coordinate system.
-        Eigen::Affine3d w2r = mPose.getTransform().inverse();
+        /*
+        // Transform the goal point to the robot or to the reference frame (first received robot pose).
+        Eigen::Affine3d w2r;
+        if(_use_fix_reference_frame.get()) {
+            w2r = mRefFrame.getTransform().inverse();
+        } else {
+            w2r = mPose.getTransform().inverse();
+        }
         base::Vector3d goal_pos_r = w2r * goal_pos;
         RTT::log(RTT::Info) << "Goal position within the robot frame: " << goal_pos_r.transpose() << RTT::endlog();
+        */
         
         // Calculate NWU rotation, angle in radians between the x-axis and the goal vector.
         base::Vector3d x_axis(1.0, 0.0, 0.0);
-        double angle_rad = acos(goal_pos_r.dot(x_axis) / goal_pos_r.norm());
+        double angle_rad = acos(goal_pos.dot(x_axis) / goal_pos.norm());
         // Assign prefix.
-        if(goal_pos_r[1] < 0) {
+        if(goal_pos[1] < 0) {
             angle_rad *= -1;
         }
         
