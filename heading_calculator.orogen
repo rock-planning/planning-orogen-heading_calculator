@@ -8,12 +8,6 @@ task_context "Task" do
         
     property('geometric_resolution', 'double', 0.02).
         doc 'Length of a single spline element'
-        
-    property('heading_offset', 'double', 0).
-        doc 'Will be added to the calculated heading value (rad, VFH*/ServoingTask requires 3.141592654)'
-        
-    property('use_fix_reference_frame', 'bool', true).
-        doc 'The first received robot frame will be used to calculate the headings'
 
     input_port("trajectory", "std::vector</base/Trajectory>").
         doc("(Global) trajectory which will be used to calculate the heading")

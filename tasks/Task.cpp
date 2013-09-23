@@ -5,14 +5,14 @@
 using namespace heading_calculator;
 
 Task::Task(std::string const& name, TaskCore::TaskState initial_state)
-    : TaskBase(name, initial_state), mTrajectory(), mPose(), mRefFrame(), mGuess(0), mPosSpline(0), 
-        mTrajectoryReceived(false), mRefFrameReceived(false)
+    : TaskBase(name, initial_state), mTrajectory(), mPose(), mGuess(0), mPosSpline(0), 
+        mTrajectoryReceived(false)
 {
 }
 
 Task::Task(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state)
-    : TaskBase(name, engine, initial_state), mTrajectory(), mPose(), mRefFrame(), mGuess(0), 
-        mPosSpline(0), mTrajectoryReceived(false), mRefFrameReceived(false)
+    : TaskBase(name, engine, initial_state), mTrajectory(), mPose(), mGuess(0), 
+        mPosSpline(0), mTrajectoryReceived(false)
 {
 }
 
@@ -59,12 +59,6 @@ void Task::updateHook()
     
     
     if(_pose_samples.read(mPose) == RTT::NewData) {
-        // Stores the first received robot pose as reference frame.
-        if(!mRefFrameReceived) {
-            mRefFrame = mPose;
-            mRefFrameReceived = true;
-        }
-    
         if(!mTrajectoryReceived) {
             RTT::log(RTT::Warning) << "Trajectory not yet received" << RTT::endlog();
             return;
@@ -89,19 +83,7 @@ void Task::updateHook()
         RTT::log(RTT::Info) << "Advance " << _goal_distance.get() << " with geometric resolution " << 
                 _geometric_resolution.get() << ", goal position on the spline: " << 
                 ret_advance.first << ", point " << goal_pos.transpose() << RTT::endlog();
-        
-        /*
-        // Transform the goal point to the robot or to the reference frame (first received robot pose).
-        Eigen::Affine3d w2r;
-        if(_use_fix_reference_frame.get()) {
-            w2r = mRefFrame.getTransform().inverse();
-        } else {
-            w2r = mPose.getTransform().inverse();
-        }
-        base::Vector3d goal_pos_r = w2r * goal_pos;
-        RTT::log(RTT::Info) << "Goal position within the robot frame: " << goal_pos_r.transpose() << RTT::endlog();
-        */
-        
+              
         // Calculate NWU rotation, angle in radians between the x-axis and the goal vector.
         base::Vector3d x_axis(1.0, 0.0, 0.0);
         double angle_rad = acos(goal_pos.dot(x_axis) / goal_pos.norm());
@@ -110,11 +92,7 @@ void Task::updateHook()
             angle_rad *= -1;
         }
         
-        // Add offset.
-        angle_rad += _heading_offset.get();
-        
-        RTT::log(RTT::Info) << "Calculated heading: " << angle_rad << ", " <<
-                (angle_rad / M_PI) * 180 << " degree " << RTT::endlog();
+        // Write to port.
         _heading.write(angle_rad);
     }
 }
