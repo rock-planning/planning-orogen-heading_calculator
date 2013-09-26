@@ -94,6 +94,9 @@ void Task::updateHook()
         
         // Write to port.
         _heading.write(angle_rad);
+        
+        // Write degree to debug port.
+        _heading_debug_deg.write((angle_rad / M_PI) * 180.0);
     }
 }
 

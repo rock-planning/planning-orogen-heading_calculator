@@ -16,7 +16,10 @@ task_context "Task" do
         doc "Robot pose within the trajectory frame."
         
     output_port('heading', 'double').
-	    doc 'Heading in NorthWestUp'
+	    doc 'Heading in NorthWestUp in radians'
+	    
+	output_port('heading_debug_deg', 'double').
+	    doc 'Heading in NorthWestUp in degree'
 	    
 	port_driven 
 end
