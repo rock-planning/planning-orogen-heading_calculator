@@ -84,11 +84,21 @@ void Task::updateHook()
                 _geometric_resolution.get() << ", goal position on the spline: " << 
                 ret_advance.first << ", point " << goal_pos.transpose() << RTT::endlog();
               
+             
+         
+        mPose.orientation = Eigen::Quaterniond::Identity(); 
+        // Transform the goal point to the robot or to the reference frame (first received robot pose).
+        Eigen::Affine3d w2r;
+        w2r = mPose.getTransform().inverse();
+
+        base::Vector3d goal_pos_r = w2r * goal_pos;
+        RTT::log(RTT::Info) << "Goal position within the robot frame: " << goal_pos_r.transpose() << RTT::endlog();
+            
         // Calculate NWU rotation, angle in radians between the x-axis and the goal vector.
         base::Vector3d x_axis(1.0, 0.0, 0.0);
-        double angle_rad = acos(goal_pos.dot(x_axis) / goal_pos.norm());
+        double angle_rad = acos(goal_pos_r.dot(x_axis) / goal_pos_r.norm());
         // Assign prefix.
-        if(goal_pos[1] < 0) {
+        if(goal_pos_r[1] < 0) {
             angle_rad *= -1;
         }
         
