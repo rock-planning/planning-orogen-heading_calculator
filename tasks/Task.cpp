@@ -85,8 +85,10 @@ void Task::updateHook()
                 ret_advance.first << ", point " << goal_pos.transpose() << RTT::endlog();
               
              
-         
-        mPose.orientation = Eigen::Quaterniond::Identity(); 
+        
+        // Heading will be calculated relative to the robot.
+        // mPose.orientation = Eigen::Quaterniond::Identity(); 
+        
         // Transform the goal point to the robot or to the reference frame (first received robot pose).
         Eigen::Affine3d w2r;
         w2r = mPose.getTransform().inverse();
