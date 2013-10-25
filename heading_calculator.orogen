@@ -3,11 +3,16 @@ name "heading_calculator"
 import_types_from "base"
 
 task_context "Task" do
-    property('goal_distance', 'double', 4.0).
+    property('goal_distance', 'double', 1.0).
         doc 'Distance to the goal position along the trajectory, in meters'
         
     property('geometric_resolution', 'double', 0.02).
         doc 'Length of a single spline element'
+
+    property('required_dist_to_goal', 'double', 0.15).
+        doc('Goal position is assumed to be reached if the distance between the').
+        doc(' robot and the goal is smaller or equal than this parameter.'). 
+        doc(' This parameter will be ignored if it is set smaller than 0.')
 
     input_port("trajectory", "std::vector</base/Trajectory>").
         doc("(Global) trajectory which will be used to calculate the heading")

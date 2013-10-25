@@ -104,11 +104,18 @@ void Task::updateHook()
             angle_rad *= -1;
         }
         
-        // Write to port.
-        _heading.write(angle_rad);
-        
-        // Write degree to debug port.
-        _heading_debug_deg.write((angle_rad / M_PI) * 180.0);
+        double dist_to_goal = (mPose.position - goal_pos).norm();
+        if(_required_dist_to_goal.get() >= 0 && 
+                dist_to_goal <= _required_dist_to_goal.get()) {
+            _heading.write(base::NaN<double>());
+             _heading_debug_deg.write(base::NaN<double>());
+        } else {
+            // Write to port.
+            _heading.write(angle_rad);
+            
+            // Write degree to debug port.
+            _heading_debug_deg.write((angle_rad / M_PI) * 180.0);
+        }
     }
 }
 
