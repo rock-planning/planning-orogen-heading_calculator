@@ -94,13 +94,14 @@ void Task::updateHook()
         w2r = mPose.getTransform().inverse();
 
         base::Vector3d goal_pos_r = w2r * goal_pos;
+        // Porject to 2D!
+        goal_pos_r.z() = 0;
         RTT::log(RTT::Info) << "Goal position within the robot frame: " << goal_pos_r.transpose() << RTT::endlog();
             
         // Calculate NWU rotation, angle in radians between the x-axis and the goal vector.
-        base::Vector3d x_axis(1.0, 0.0, 0.0);
-        double angle_rad = acos(goal_pos_r.dot(x_axis) / goal_pos_r.norm());
+        double angle_rad = acos(goal_pos_r.dot(Eigen::Vector3d::UnitX()) / goal_pos_r.norm());
         // Assign prefix.
-        if(goal_pos_r[1] < 0) {
+        if(goal_pos_r.y() < 0) {
             angle_rad *= -1;
         }
         
