@@ -58,7 +58,7 @@ void Task::updateHook()
     }
     
     
-    if(_pose_samples.read(mPose) == RTT::NewData) {
+    if(_pose_samples.readNewest(mPose) == RTT::NewData) {
         if(!mTrajectoryReceived) {
             RTT::log(RTT::Info) << "Trajectory not yet received" << RTT::endlog();
             return;
