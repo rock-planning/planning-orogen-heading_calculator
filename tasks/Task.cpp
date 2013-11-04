@@ -105,7 +105,11 @@ void Task::updateHook()
             angle_rad *= -1;
         }
         
-        double dist_to_goal = (mPose.position - goal_pos).norm();
+        //ignore Z
+        Eigen::Vector3d vecToGoal = (mPose.position - goal_pos);
+        vecToGoal.z() = 0;
+        
+        double dist_to_goal = vecToGoal.norm();
         if(_required_dist_to_goal.get() >= 0 && 
                 dist_to_goal <= _required_dist_to_goal.get()) {
             _heading.write(base::NaN<double>());
