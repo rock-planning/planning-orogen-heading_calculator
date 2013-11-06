@@ -48,7 +48,9 @@ void Task::updateHook()
     if(_trajectory.read(trajectories) == RTT::NewData) {
         RTT::log(RTT::Info) << "Received new trajectory" << RTT::endlog();
         if(trajectories.size() == 0) {
-            RTT::log(RTT::Warning) << "Received trajectory vector is empty" << RTT::endlog();
+            _heading.write(base::NaN<double>());
+             _heading_debug_deg.write(base::NaN<double>());
+	     RTT::log(RTT::Warning) << "Received trajectory vector is empty stopping robot" << RTT::endlog();
             return;
         }
         mTrajectory = trajectories[0];
