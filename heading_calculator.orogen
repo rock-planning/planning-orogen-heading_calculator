@@ -27,5 +27,7 @@ task_context "Task" do
 	    doc 'Heading in NorthWestUp in degree'
 	    
 	port_driven 
+
+    runtime_states :TARGET_REACHED
 end
 
