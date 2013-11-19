@@ -37,6 +37,13 @@ bool Task::startHook()
 {
     if (! TaskBase::startHook())
         return false;
+
+    mTrajectory = base::Trajectory();
+    mPose.invalidate();
+    mGuess = 0;
+    mPosSpline = 0; 
+    mTrajectoryReceived = false;
+
     return true;
 }
 
