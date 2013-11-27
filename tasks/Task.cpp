@@ -90,7 +90,7 @@ void Task::updateHook()
                 _geometric_resolution.get());
         base::Vector3d goal_pos = mTrajectory.spline.getPoint(ret_advance.first);
         RTT::log(RTT::Info) << "Advance " << _goal_distance.get() << " with geometric resolution " << 
-                _geometric_resolution.get() << ", goal position on the spline: " << 
+                _geometric_resolution.get() << ", current goal position on the spline: " << 
                 ret_advance.first << ", point " << goal_pos.transpose() << RTT::endlog();
               
              
@@ -103,9 +103,9 @@ void Task::updateHook()
         w2r = mPose.getTransform().inverse();
 
         base::Vector3d goal_pos_r = w2r * goal_pos;
-        // Porject to 2D!
+        // Project to 2D!
         goal_pos_r.z() = 0;
-        RTT::log(RTT::Info) << "Goal position within the robot frame: " << goal_pos_r.transpose() << RTT::endlog();
+        RTT::log(RTT::Info) << "Current goal position within the robot frame: " << goal_pos_r.transpose() << RTT::endlog();
             
         // Calculate NWU rotation, angle in radians between the x-axis and the goal vector.
         double angle_rad = acos(goal_pos_r.dot(Eigen::Vector3d::UnitX()) / goal_pos_r.norm());
@@ -114,16 +114,19 @@ void Task::updateHook()
             angle_rad *= -1;
         }
         
-        //ignore Z
-        Eigen::Vector3d vecToGoal = (mPose.position - goal_pos);
-        vecToGoal.z() = 0;
+        // Z coordinate / height will be ignored.
+        Eigen::Vector3d current_pos = mPose.position;
+        current_pos.z() = 0;
+        Eigen::Vector3d end_pos = mTrajectory.spline.getEndPoint();
+        end_pos.z() = 0;
         
-        double dist_to_goal = vecToGoal.norm();
+        double dist_to_goal = (current_pos - end_pos).norm();
         if(_required_dist_to_goal.get() >= 0 && 
                 dist_to_goal <= _required_dist_to_goal.get()) {
+            RTT::log(RTT::Info) << "End of the spline reached, distance to the goal: " << dist_to_goal << RTT::endlog();
             _heading.write(base::NaN<double>());
-             _heading_debug_deg.write(base::NaN<double>());
-             state(TARGET_REACHED);
+            _heading_debug_deg.write(base::NaN<double>());
+            state(TARGET_REACHED);
         } else {
             // Write to port.
             _heading.write(angle_rad);

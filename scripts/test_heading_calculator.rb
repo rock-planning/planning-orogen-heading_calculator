@@ -20,7 +20,7 @@ Orocos.run 'heading_calculator::Task' => 'calculator' do
     pose_writer = calc.pose_samples.writer
     pose_sample = pose_writer.new_sample
     
-    # Test 1: Straight line with length 10.
+    # Test: Straight line with length 10.
     points = []
     for i in 0 .. 10
         points << Eigen::Vector3.new( i, 0, 0 )
@@ -34,7 +34,7 @@ Orocos.run 'heading_calculator::Task' => 'calculator' do
     traj_sample << trajectory
     traj_writer.write(traj_sample)
     
-    puts "\nTEST 1, straight line"
+    puts "\nTEST: straight line"
     traj_writer = calc.trajectory.writer
     traj_sample = traj_writer.new_sample
     
@@ -44,8 +44,20 @@ Orocos.run 'heading_calculator::Task' => 'calculator' do
     
     Readline::readline("Press ENTER to proceed ...")
   
-    # Test 2: Curve around the robot, same distance to (3,0), (4.1) and (3,2).
-    puts "\nTEST 2, Spline length 2 instead of 10, heading 81 instead of 90"
+    # Test: Smaller 'goal_distance' than 'required_dist_to_goal'.
+    puts "\nTEST: Smaller 'goal_distance' than 'required_dist_to_goal"
+    calc.goal_distance = 0.5
+    calc.required_dist_to_goal = 1.0
+    
+    pose_sample.position[0] = 0
+    pose_sample.position[1] = 0
+    pose_writer.write(pose_sample)
+    
+    Readline::readline("Press ENTER to proceed ...")
+    
+  
+    # Test: Curve around the robot, same distance to (3,0), (4.1) and (3,2).
+    puts "\nTEST: Spline length 2 instead of 10, heading 81 instead of 90"
     calc.goal_distance = 4.0
     
     points = []
@@ -72,7 +84,7 @@ Orocos.run 'heading_calculator::Task' => 'calculator' do
     
     Readline::readline("Press ENTER to proceed ...")
     
-    puts "\nTEST 3, rotates the robot -90 degree around Z"
+    puts "\nTEST: Rotates the robot -90 degree around Z"
     calc.goal_distance = 4.0
     
     pose_sample.position[0] = 3
@@ -80,15 +92,17 @@ Orocos.run 'heading_calculator::Task' => 'calculator' do
     pose_sample.orientation = Eigen::Quaternion.from_angle_axis(-0.5 * Math::PI, Eigen::Vector3.UnitZ)
     pose_writer.write(pose_sample)
     
-    puts "\nTEST 4, same like 3, but with an offset of 3.141592654"
-    calc.heading_offset += 3.141592654
+    Readline::readline("Press ENTER to proceed ...")
     
+    puts "\nTEST: Start position is within 'required_dist_to_goal' to the goal"
+    calc.goal_distance = 1.0
+    calc.required_dist_to_goal = 2.0
+    calc.geometric_resolution = 0.02
     
-    pose_sample.position[0] = 3
-    pose_sample.position[1] = 1
-    pose_sample.orientation = Eigen::Quaternion.from_angle_axis(-0.5 * Math::PI, Eigen::Vector3.UnitZ)
+    pose_sample.position[0] = 0
+    pose_sample.position[1] = 0
     pose_writer.write(pose_sample)
-    
+      
     Readline::readline("Press ENTER to exit ...")
 end
 
